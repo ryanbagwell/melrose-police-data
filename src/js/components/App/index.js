@@ -123,7 +123,7 @@ export default class App extends React.Component {
       .endAt(endTS, 'timestamp')
       .once('value').then((snapshot) => {
 
-      let filtered = Object.values(snapshot.val());
+      let filtered = Object.values(snapshot.val() || {});
 
       cache.set(`${startTS}-${endTS}`, filtered);
 
