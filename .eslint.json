@@ -1,0 +1,18 @@
+{
+  "parser": "babel-eslint",
+  "extends": [
+    "eslint-config-hzdg",
+    "eslint-config-hzdg-react"
+  ],
+  "rules": {
+    "jsx-a11y/href-no-hash": "off",
+    "jsx-a11y/iframe-has-title": "off",
+    "jsx-a11y/no-static-element-interactions": "off",
+    "react/no-danger": "off",
+    "arrow-body-style": "off",
+    "react/no-array-index-key": "off",
+    "react/no-find-dom-node": "off",
+    "no-magic-numbers": "off",
+    "no-return-assign": "off"
+  }
+}
