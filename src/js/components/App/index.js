@@ -9,6 +9,44 @@ import cache from '../../utils/cache';
 
 const firebase = getFirebase();
 
+const today = moment().format('M/D/YYYY');
+
+const dates = {
+  all: {
+    startDate: '1/1/2016',
+    endDate: today,
+  },
+  thisYear: {
+    startDate: `1/1/${moment().format('YYYY')}`,
+    endDate: today,
+  },
+  last7Days: {
+    startDate: moment().subtract(7, 'days').format('M/D/YYYY'),
+    endDate: today,
+  },
+  last14Days: {
+    startDate: moment().subtract(14, 'days').format('M/D/YYYY'),
+    endDate: today,
+  },
+  last30Days: {
+    startDate: moment().subtract(30, 'days').format('M/D/YYYY'),
+    endDate: today,
+  },
+  last60Days: {
+    startDate: moment().subtract(60, 'days').format('M/D/YYYY'),
+    endDate: today,
+  },
+  last90Days: {
+    startDate: moment().subtract(90, 'days').format('M/D/YYYY'),
+    endDate: today,
+  },
+  last12Months: {
+    startDate: moment().subtract(12, 'months').format('M/D/YYYY'),
+    endDate: today,
+  }
+
+}
+
 
 export default class App extends React.Component {
 
@@ -27,48 +65,35 @@ export default class App extends React.Component {
   }
 
   showAllDates = () => {
-
-    this.query({
-      startDate: '1/1/2016',
-      endDate: moment().format('M/D/YYYY'),
-    });
-
+    this.query(dates.all);
   }
 
   showThisYear = () => {
-
-    this.query({
-      startDate: `1/1/${moment().format('YYYY')}`,
-      endDate: moment().format('M/D/YYYY'),
-    });
-
+    this.query(dates.thisYear);
   }
 
   showLast7Days = () => {
+    this.query(dates.last7Days)
+  }
 
-    this.query({
-      startDate: moment().subtract(7, 'days').format('M/D/YYYY'),
-      endDate: moment().format('M/D/YYYY'),
-    })
-
+  showLast14Days = () => {
+    this.query(dates.last14Days)
   }
 
   showLast30Days = () => {
+    this.query(dates.last30Days)
+  }
 
-    this.query({
-      startDate: moment().subtract(30, 'days').format('M/D/YYYY'),
-      endDate: moment().format('M/D/YYYY'),
-    })
+  showLast60Days = () => {
+    this.query(dates.last60Days)
+  }
 
+  showLast90Days = () => {
+    this.query(dates.last90Days)
   }
 
   showLast12Months = () => {
-
-    this.query({
-      startDate: moment().subtract(12, 'months').format('M/D/YYYY'),
-      endDate: moment().format('M/D/YYYY'),
-    });
-
+   this.query(dates.last12Months);
   }
 
   componentDidMount() {
@@ -194,10 +219,25 @@ export default class App extends React.Component {
                     className="btn btn-default"
                     onClick={this.showLast7Days}>Last 7 Days</button>
 
+                 <button
+                    type="button"
+                    className="btn btn-default"
+                    onClick={this.showLast14Days}>Last Two Weeks</button>
+
                   <button
                     type="button"
                     className="btn btn-default"
                     onClick={this.showLast30Days}>Last 30 Days</button>
+
+                  <button
+                    type="button"
+                    className="btn btn-default"
+                    onClick={this.showLast60Days}>Last 60 Days</button>
+
+                  <button
+                    type="button"
+                    className="btn btn-default"
+                    onClick={this.showLast90Days}>Last 90 Days</button>
 
                   <button
                     type="button"

@@ -95,29 +95,42 @@ export default class MapView extends React.Component {
 
     return (
       <div>
-        <BaseMap
-          ref={x => this.instance = x}
-          onMapLoad={this.onMapLoad}
-          incidents={this.state.incidents}
-          containerElement={
-            <div style={{
-              width: '100%',
-              height: 0,
-              paddingBottom: '50%',
-              position: 'relative',
-            }} />
-          }
-          mapElement={
-            <div style={{
-              position: 'absolute',
-              width: '100%',
-              height: '100%',
-              top: 0,
-              left: 0,
-             }} />
-          }
-          />
-          <h4>*Showing {this.state.mapPoints.length} incidents with position data</h4>
+        {
+          this.state.mapPoints.length < 1000 ? (
+            <span>
+            <BaseMap
+              ref={x => this.instance = x}
+              onMapLoad={this.onMapLoad}
+              incidents={this.state.incidents}
+              containerElement={
+                <div style={{
+                  width: '100%',
+                  height: 0,
+                  paddingBottom: '50%',
+                  position: 'relative',
+                }} />
+              }
+              mapElement={
+                <div style={{
+                  position: 'absolute',
+                  width: '100%',
+                  height: '100%',
+                  top: 0,
+                  left: 0,
+                 }} />
+              } />
+
+             <h4>*Showing {this.state.mapPoints.length} incidents with position data</h4>
+            </span>
+          ) : (
+            <span>
+              <h2 className="text-center">Too many incidents selected</h2>
+              <p className="text-center">Heatmaps can take up to 1,000 points. Please filter your selections.</p>
+            </span>
+          )
+        }
+
+
       </div>
 
     )
@@ -125,36 +138,3 @@ export default class MapView extends React.Component {
   }
 
 }
-
-
-// export default withGoogleMap(props => (
-//   <GoogleMap
-//     ref={props.onMapLoad}
-//     defaultZoom={3}
-//     defaultCenter={{ lat: -25.363882, lng: 131.044922 }}
-//     onClick={props.onMapClick}>
-//     {props.markers.map((marker, index) => (
-//       <Marker
-//         {...marker}
-//         onRightClick={() => props.onMarkerRightClick(index)}
-//       />
-//     ))}
-//   </GoogleMap>
-// ));
-
-// Then, render it:
-// render(
-//   <GettingStartedGoogleMap
-//     containerElement={
-//       <div style={{ height: `100%` }} />
-//     }
-//     mapElement={
-//       <div style={{ height: `100%` }} />
-//     }
-//     onMapLoad={_.noop}
-//     onMapClick={_.noop}
-//     markers={markers}
-//     onMarkerRightClick={_.noop}
-//   />,
-//   document.getElementById('root')
-// );
