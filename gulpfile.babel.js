@@ -5,6 +5,7 @@ import livereload from 'gulp-livereload';
 import webpackConfig from './webpack.config';
 import sassInlineImage from 'sass-inline-image';
 import server from 'gulp-webserver';
+import copy from 'gulp-copy';
 
 
 gulp.task('build-sass', () => {
@@ -19,6 +20,26 @@ gulp.task('build-sass', () => {
     .on('end', () => {
       livereload.changed('SASS built');
     });
+
+});
+
+
+gulp.task('copy-html', () => {
+
+  return gulp.src('./src/html/**/*.html')
+    .pipe(gulp.dest('dist'))
+    .on('end', () => {
+      livereload.changed('HTML copied');
+    });
+
+});
+
+
+gulp.task('build-js', (cb) => {
+
+  webpack(webpackConfig, () => {
+    cb();
+  });
 
 });
 
@@ -44,8 +65,11 @@ gulp.task('watch', () => {
     }));
 
 
-  // gulp.watch('../**/*.{php,jpg,svg,png,html}', livereload.changed.bind(null, 'Reloading ...'));
+  gulp.watch('./src/html/**/*.html}', ['copy-html'], () => {
 
-  // gulp.watch('../**/*.{php,jpg,svg,png}', livereload.changed.bind(null, 'Reloading ...'));
+  });
 
 })
+
+
+gulp.task('build', ['copy-html', 'build-sass', 'build-js']);

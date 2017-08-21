@@ -1,3 +1,4 @@
 .webpackrecords
 node_modules
 assets
+dist

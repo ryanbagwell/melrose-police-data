@@ -20,6 +20,7 @@
     "firebase": "^4.2.0",
     "force-case-sensitivity-webpack-plugin": "^0.2.1",
     "gulp": "^3.9.1",
+    "gulp-copy": "^1.0.1",
     "gulp-livereload": "^3.8.1",
     "gulp-sass": "^3.1.0",
     "gulp-webserver": "^0.9.1",
