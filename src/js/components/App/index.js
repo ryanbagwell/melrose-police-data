@@ -60,6 +60,7 @@ export default class App extends React.Component {
       streetNameFilter: '',
       incidentNameFilter: '',
       viewType: 'IncidentList',
+      loading: false,
     }
 
   }
@@ -101,6 +102,10 @@ export default class App extends React.Component {
   }
 
   query = ({startDate, endDate}) => {
+
+    this.setState({
+      loading: true,
+    });
 
     let startTS = moment(startDate || this.state.startDate, ['M/D/YYYY', 'MM/DD/YYYY']).unix();
 
@@ -144,6 +149,10 @@ export default class App extends React.Component {
       endDate,
       incidents,
     });
+
+    this.setState({
+      loading: false,
+    })
 
   }
 
@@ -319,13 +328,19 @@ export default class App extends React.Component {
 
         </div>
 
-        <div className="panel panel-default">
+        <div
+          className="panel panel-default">
 
           <div className="panel-heading">
             <h2 className="panel-title">{filtered.length} Results</h2>
           </div>
 
-          <div className="panel-body">
+          <div
+            className="panel-body"
+            style={{
+              opacity: this.state.loading ? .5 : 1,
+              transition: 'opacity .2s linear',
+            }}>
 
             {
               this.state.viewType == 'IncidentList' && (
