@@ -13,38 +13,46 @@ const firebase = getFirebase();
 const today = moment().format('M/D/YYYY');
 
 const dates = {
-  all: {
-    startDate: '1/1/2016',
-    endDate: today,
-  },
-  thisYear: {
-    startDate: `1/1/${moment().format('YYYY')}`,
-    endDate: today,
-  },
   last7Days: {
     startDate: moment().subtract(7, 'days').format('M/D/YYYY'),
     endDate: today,
+    label: 'Last 7 Days',
   },
   last14Days: {
     startDate: moment().subtract(14, 'days').format('M/D/YYYY'),
     endDate: today,
+    label: 'Last 14 Days',
   },
   last30Days: {
     startDate: moment().subtract(30, 'days').format('M/D/YYYY'),
     endDate: today,
+    label: 'Last 30 Days',
   },
   last60Days: {
     startDate: moment().subtract(60, 'days').format('M/D/YYYY'),
     endDate: today,
+    label: 'Last 60 Days',
   },
   last90Days: {
     startDate: moment().subtract(90, 'days').format('M/D/YYYY'),
     endDate: today,
+    label: 'Last 90 Days',
+  },
+  thisYear: {
+    startDate: `1/1/${moment().format('YYYY')}`,
+    endDate: today,
+    label: 'This Year',
   },
   last12Months: {
     startDate: moment().subtract(12, 'months').format('M/D/YYYY'),
     endDate: today,
-  }
+    label: 'Last 12 Months',
+  },
+  all: {
+    startDate: '1/1/2016',
+    endDate: today,
+    label: 'All Dates',
+  },
 
 }
 
@@ -55,6 +63,7 @@ export default class App extends React.Component {
     super(props);
 
     this.state = {
+      dateQuery: null,
       startDate: moment().subtract(30, 'days').format('M/D/YYYY'),
       endDate: moment().format('M/D/YYYY'),
       incidents: [],
@@ -66,36 +75,8 @@ export default class App extends React.Component {
 
   }
 
-  showAllDates = () => {
-    this.setState(dates.all, this.query);
-  }
-
-  showThisYear = () => {
-    this.setState(dates.thisYear, this.query);
-  }
-
-  showLast7Days = () => {
-    this.setState(dates.last7Days, this.query)
-  }
-
-  showLast14Days = () => {
-    this.setState(dates.last14Days, this.query)
-  }
-
-  showLast30Days = () => {
-    this.setState(dates.last30Days, this.query)
-  }
-
-  showLast60Days = () => {
-    this.setState(dates.last60Days, this.query)
-  }
-
-  showLast90Days = () => {
-    this.setState(dates.last90Days, this.query)
-  }
-
-  showLast12Months = () => {
-   this.setState(dates.last12Months, this.query);
+  changeDateQuery = (dateRange) => {
+    this.setState(dateRange, this.query);
   }
 
   componentDidMount() {
@@ -224,45 +205,23 @@ export default class App extends React.Component {
               <div className="form-group">
                 <div className="btn-group" role="group">
 
-                  <button
-                    type="button"
-                    className="btn btn-default"
-                    onClick={this.showLast7Days}>Last 7 Days</button>
+                  {
+                    Object.values(dates).map( ({startDate, endDate, label}, i) => {
+                      return (
+                        <button
+                          key={i}
+                          type="button"
+                          className={`btn ${this.state.startDate === startDate && this.state.endDate === endDate ? 'btn-info' : 'btn-default'}`}
+                          data-selected={this.state.startDate === startDate && this.state.endDate === endDate}
+                          onClick={x => this.changeDateQuery({startDate, endDate})}>
+                          {label}
+                        </button>
+                      )
 
-                 <button
-                    type="button"
-                    className="btn btn-default"
-                    onClick={this.showLast14Days}>Last Two Weeks</button>
+                    })
 
-                  <button
-                    type="button"
-                    className="btn btn-default"
-                    onClick={this.showLast30Days}>Last 30 Days</button>
+                  }
 
-                  <button
-                    type="button"
-                    className="btn btn-default"
-                    onClick={this.showLast60Days}>Last 60 Days</button>
-
-                  <button
-                    type="button"
-                    className="btn btn-default"
-                    onClick={this.showLast90Days}>Last 90 Days</button>
-
-                  <button
-                    type="button"
-                    className="btn btn-default"
-                    onClick={this.showThisYear}>This Year</button>
-
-                  <button
-                    type="button"
-                    className="btn btn-default"
-                    onClick={this.showLast12Months}>Last 12 months</button>
-
-                  <button
-                    type="button"
-                    className="btn btn-default"
-                    onClick={this.showAllDates}>Show All</button>
                 </div>
               </div>
 
@@ -333,7 +292,7 @@ export default class App extends React.Component {
           className={`App__results panel panel-default ${this.state.loading ? 'loading' : 'loaded'}`}>
 
           <div className="panel-heading">
-            <h2 className="panel-title">{this.state.incidents.length} Results</h2>
+            <h2 className="panel-title">Showing {this.state.incidents.length} incidents from {this.state.startDate} through {this.state.endDate}</h2>
           </div>
 
           <div
