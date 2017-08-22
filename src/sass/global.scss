@@ -1,0 +1,68 @@
+@import '_loading.scss';
+
+.Loading {
+  position: absolute;
+  top: 100px;
+  transform: translateX(-50%);
+  z-index: 2;
+  opacity: 0;
+  left: -600%;
+  transition: opacity .2s linear 0s, left 0s linear .3s;
+
+  .loading & {
+    left: 50%;
+    opacity: 1;
+    transition: opacity .2s linear;
+  }
+}
+
+.App__results {
+  position: relative;
+}
+
+.App__results__screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: gray;
+  z-index: 3;
+  opacity: 0;
+  transition: opacity .2s linear 0s, left 0s linear .3s;
+
+  .loading & {
+    left: 0px;
+    opacity: 0.3;
+    transition: opacity .2s linear;
+  }
+}
+
+
+
+
+
+// html, body, main {
+//   width: 100%;
+//   height: 100%;
+//   overflow: hidden;
+// }
+
+// .App {
+//   display: flex;
+//   flex-direction: column;
+//   justify-content: flex-start;
+//   height: 100%;
+// }
+
+// .App__h1 {
+//   flex: 0 0 39px;
+// }
+
+// .App__filter {
+//   flex: 0 0 266px;
+// }
+
+// .App__results {
+//   flex: 2 2 auto;
+// }

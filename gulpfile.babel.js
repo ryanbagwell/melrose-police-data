@@ -65,9 +65,7 @@ gulp.task('watch', () => {
     }));
 
 
-  gulp.watch('./src/html/**/*.html}', ['copy-html'], () => {
-
-  });
+  gulp.watch('./src/html/**/*.html}', ['copy-html']);
 
 })
 

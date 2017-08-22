@@ -6,6 +6,7 @@ import IncidentList from '../IncidentList';
 import TotalByWeek from '../TotalByWeek';
 import MapView from '../MapView';
 import cache from '../../utils/cache';
+import Loading from '../Loading';
 
 const firebase = getFirebase();
 
@@ -66,60 +67,66 @@ export default class App extends React.Component {
   }
 
   showAllDates = () => {
-    this.query(dates.all);
+    this.setState(dates.all, this.query);
   }
 
   showThisYear = () => {
-    this.query(dates.thisYear);
+    this.setState(dates.thisYear, this.query);
   }
 
   showLast7Days = () => {
-    this.query(dates.last7Days)
+    this.setState(dates.last7Days, this.query)
   }
 
   showLast14Days = () => {
-    this.query(dates.last14Days)
+    this.setState(dates.last14Days, this.query)
   }
 
   showLast30Days = () => {
-    this.query(dates.last30Days)
+    this.setState(dates.last30Days, this.query)
   }
 
   showLast60Days = () => {
-    this.query(dates.last60Days)
+    this.setState(dates.last60Days, this.query)
   }
 
   showLast90Days = () => {
-    this.query(dates.last90Days)
+    this.setState(dates.last90Days, this.query)
   }
 
   showLast12Months = () => {
-   this.query(dates.last12Months);
+   this.setState(dates.last12Months, this.query);
   }
 
   componentDidMount() {
-    this.query(this.state);
+    this.query();
   }
 
-  query = ({startDate, endDate}) => {
+  query = () => {
 
     this.setState({
       loading: true,
     });
 
-    let startTS = moment(startDate || this.state.startDate, ['M/D/YYYY', 'MM/DD/YYYY']).unix();
+    let startTS = moment(this.state.startDate, ['M/D/YYYY', 'MM/DD/YYYY']).unix();
 
-    let endTS = moment(endDate || this.state.endDate, ['M/D/YYYY', 'MM/DD/YYYY']).unix();
+    let endTS = moment(this.state.endDate, ['M/D/YYYY', 'MM/DD/YYYY']).unix();
 
-    let cachedResults = cache.get(`${startTS}-${endTS}`);
+    let cacheKey = [
+      this.state.startDate,
+      this.state.endDate,
+      this.state.streetNameFilter,
+      this.state.incidentNameFilter,
+    ].filter(x => x).join('-');
+
+    let cachedResults = cache.get(cacheKey);
 
     if (cachedResults) {
-      this.updateIncidentSet(
-        startDate,
-        endDate,
-        cachedResults,
-      );
-      return;
+
+      return this.setState({
+        incidents: cachedResults,
+      }, () => this.setState({loading: false}));
+
     }
 
     firebase.database().ref('/reports/')
@@ -128,31 +135,39 @@ export default class App extends React.Component {
       .endAt(endTS, 'timestamp')
       .once('value').then((snapshot) => {
 
-      let filtered = Object.values(snapshot.val() || {});
+      let results = Object.values(snapshot.val() || {});
 
-      cache.set(`${startTS}-${endTS}`, filtered);
+      if (this.state.streetNameFilter || this.state.incidentNameFilter) {
+        results = this.getFilteredIncidents(results);
+      }
 
-      this.updateIncidentSet(
-        startDate,
-        endDate,
-        filtered,
-      );
+      this.setState({
+        incidents: results,
+      }, () => this.setState({loading: false}));
+
+      cache.set(cacheKey, results);
 
     });
 
   }
 
-  updateIncidentSet = (startDate, endDate, incidents) => {
+  getFilteredIncidents = (incidents) => {
 
-    this.setState({
-      startDate,
-      endDate,
-      incidents,
+    return incidents.filter((item) => {
+
+      try {
+        if (streetNameFilter && item.finalLocation && !item.finalLocation.toLowerCase().includes(streetNameFilter.toLowerCase())) {
+          return false;
+        }
+      } catch (e) {
+        return false;
+      }
+
+      if (incidentNameFilter && !item.incidentName.toLowerCase().includes(incidentNameFilter.toLowerCase())) return false;
+
+      return true;
+
     });
-
-    this.setState({
-      loading: false,
-    })
 
   }
 
@@ -161,7 +176,7 @@ export default class App extends React.Component {
 
     this.setState({
       streetNameFilter: this.streetNameFilter.value,
-    });
+    }, this.query);
 
   }
 
@@ -172,7 +187,8 @@ export default class App extends React.Component {
 
     this.setState({
       incidentNameFilter: this.incidentNameFilter.value,
-    });
+    }, this.query);
+
 
   }
 
@@ -188,29 +204,14 @@ export default class App extends React.Component {
 
   render() {
 
-    let filtered = this.state.incidents.filter((item) => {
-
-      try {
-        if (this.state.streetNameFilter && item.finalLocation && !item.finalLocation.toLowerCase().includes(this.state.streetNameFilter.toLowerCase())) {
-          return false;
-        }
-      } catch (e) {
-        return false;
-      }
-
-      if (this.state.incidentNameFilter && !item.incidentName.toLowerCase().includes(this.state.incidentNameFilter.toLowerCase())) return false;
-
-      return true;
-
-
-    });
 
     return (
       <section className="App container">
 
-        <h1>Melrose Police Incidents (Beta)</h1>
+        <h1 className="App__h1">Melrose Police Incidents (Beta)</h1>
 
-        <div className="panel panel-default">
+        <div
+          className="App__filter panel panel-default">
 
           <div className="panel-heading">
             <h2 className="panel-title">Filter By</h2>
@@ -329,38 +330,37 @@ export default class App extends React.Component {
         </div>
 
         <div
-          className="panel panel-default">
+          className={`App__results panel panel-default ${this.state.loading ? 'loading' : 'loaded'}`}>
 
           <div className="panel-heading">
-            <h2 className="panel-title">{filtered.length} Results</h2>
+            <h2 className="panel-title">{this.state.incidents.length} Results</h2>
           </div>
 
           <div
-            className="panel-body"
-            style={{
-              opacity: this.state.loading ? .5 : 1,
-              transition: 'opacity .2s linear',
-            }}>
+            className='panel-body'>
 
             {
               this.state.viewType == 'IncidentList' && (
-              <IncidentList incidents={filtered} />
+              <IncidentList incidents={this.state.incidents} />
               )
             }
 
             {
               this.state.viewType == 'TotalByWeek' && (
-              <TotalByWeek incidents={filtered} />
+              <TotalByWeek incidents={this.state.incidents} />
               )
             }
 
             {
               this.state.viewType == 'MapView' && (
-              <MapView incidents={filtered} />
+              <MapView incidents={this.state.incidents} />
               )
             }
-
           </div>
+
+          <Loading />
+
+          <div className="App__results__screen" />
 
         </div>
 
