@@ -51,6 +51,10 @@ export default class WeeklyDataTable extends React.Component {
               Total
             </th>
 
+            <th>
+              Avg. Per<br />Ptl. Shift
+            </th>
+
           </tr>
         </thead>
 
@@ -79,6 +83,8 @@ export default class WeeklyDataTable extends React.Component {
                   </td>
 
                   <td>{numIncidents}</td>
+
+                  <td>{(numIncidents / 63).toPrecision(2)}</td>
 
                 </tr>
               )
