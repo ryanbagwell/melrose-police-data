@@ -134,6 +134,8 @@ export default class App extends React.Component {
 
   getFilteredIncidents = (incidents) => {
 
+    let {streetNameFilter, incidentNameFilter} = this.state;
+
     return incidents.filter((item) => {
 
       try {
