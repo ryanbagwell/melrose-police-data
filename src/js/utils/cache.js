@@ -5,7 +5,7 @@ const KEY_PREFIX = 'MPD';
 export default {
 
   getKeyHash: function(key) {
-    return btoa(key).substring(0, 10);
+    return btoa(key);
   },
   get: function(key, value) {
     let val = sessionStorage.getItem(this.getKeyHash(`${KEY_PREFIX}:${key}`));
