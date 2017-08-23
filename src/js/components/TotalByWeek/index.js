@@ -7,7 +7,7 @@ import moment from 'moment';
 export default class WeeklyDataTable extends React.Component {
 
   static propTypes = {
-    incidents: PropTypes.object,
+    incidents: PropTypes.array,
   }
 
   render() {

@@ -4,6 +4,7 @@ import getFirebase from '../../utils/getFirebase';
 import moment from 'moment';
 import IncidentList from '../IncidentList';
 import TotalByWeek from '../TotalByWeek';
+import TotalPerShift from '../TotalPerShift';
 import MapView from '../MapView';
 import cache from '../../utils/cache';
 import Loading from '../Loading';
@@ -279,6 +280,11 @@ export default class App extends React.Component {
                   <button
                     type="button"
                     className="btn btn-default"
+                    onClick={this.updateViewType.bind(null, 'TotalPerShift')}>Total Per Shift</button>
+
+                  <button
+                    type="button"
+                    className="btn btn-default"
                     onClick={this.updateViewType.bind(null, 'MapView')}>Heatmap</button>
 
                 </div>
@@ -309,6 +315,12 @@ export default class App extends React.Component {
             {
               this.state.viewType == 'TotalByWeek' && (
               <TotalByWeek incidents={this.state.incidents} />
+              )
+            }
+
+            {
+              this.state.viewType == 'TotalPerShift' && (
+              <TotalPerShift incidents={this.state.incidents} />
               )
             }
 
