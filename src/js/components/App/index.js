@@ -155,24 +155,13 @@ export default class App extends React.Component {
 
   }
 
-  updateStreetNameFilter = (e) => {
-    e.preventDefault();
-
-    this.setState({
-      streetNameFilter: this.streetNameFilter.value,
-    }, this.query);
-
-  }
-
-
-  updateIncidentName = (e) => {
-
+  updateFilters = (e) => {
     e.preventDefault();
 
     this.setState({
       incidentNameFilter: this.incidentNameFilter.value,
+      streetNameFilter: this.streetNameFilter.value,
     }, this.query);
-
 
   }
 
@@ -239,7 +228,7 @@ export default class App extends React.Component {
                     <button
                       className="btn btn-default"
                       type="button"
-                      onClick={this.updateStreetNameFilter}>Update</button>
+                      onClick={this.updateFilters}>Update</button>
                   </span>
                 </div>
               </div>
@@ -255,7 +244,7 @@ export default class App extends React.Component {
                     <button
                       className="btn btn-default"
                       type="button"
-                      onClick={this.updateIncidentName}>Update</button>
+                      onClick={this.updateFilters}>Update</button>
                   </span>
                 </div>
               </div>
@@ -300,7 +289,12 @@ export default class App extends React.Component {
           className={`App__results panel panel-default ${this.state.loading ? 'loading' : 'loaded'}`}>
 
           <div className="panel-heading">
-            <h2 className="panel-title">Showing {this.state.incidents.length} incidents from {this.state.startDate} through {this.state.endDate}</h2>
+            <h2 className="panel-title">
+              Showing {this.state.incidents.length} incidents from {this.state.startDate} through {this.state.endDate}
+              {
+                (this.state.incidentNameFilter || this.state.streetNameFilter) && " with filters " + [this.state.incidentNameFilter, this.state.streetNameFilter].filter(x => x).join(',')
+              }
+              </h2>
           </div>
 
           <div
