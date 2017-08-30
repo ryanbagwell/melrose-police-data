@@ -44,7 +44,7 @@ export default class IncidentList extends React.Component {
             </th>
 
             <th>
-              Name
+              Type
             </th>
 
             <th>
@@ -56,11 +56,7 @@ export default class IncidentList extends React.Component {
             </th>
 
             <th>
-              Disposition
-            </th>
-
-            <th>
-              Narrative
+              Details
             </th>
           </tr>
         </thead>
@@ -88,10 +84,6 @@ export default class IncidentList extends React.Component {
 
                 <td>
                   {incident.finalLocation}
-                </td>
-
-                <td>
-                  {incident.disposition}
                 </td>
 
                 <td>

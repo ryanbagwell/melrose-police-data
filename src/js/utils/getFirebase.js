@@ -13,12 +13,5 @@ export default () => {
 
   window.firebase = window.firebase || firebase.initializeApp(config);
 
-
-  // window.firebase.auth()
-  //   .signInWithEmailAndPassword()
-  //   .catch((err) => {
-  //     console.log(err);
-  //   });
-
   return window.firebase;
 }

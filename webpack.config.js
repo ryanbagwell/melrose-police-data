@@ -10,6 +10,7 @@ export default {
   devtool: '#source-map',
   entry: {
     'index': './src/js/index.js',
+    'login': './src/js/login.js',
   },
   output: {
     path: resolve(__dirname, 'dist'),
