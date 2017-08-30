@@ -8,6 +8,7 @@ import TotalPerShift from '../TotalPerShift';
 import MapView from '../MapView';
 import cache from '../../utils/cache';
 import Loading from '../Loading';
+import QueryString from 'query-string';
 
 const firebase = getFirebase();
 
@@ -63,14 +64,22 @@ export default class App extends React.Component {
   constructor(props) {
     super(props);
 
+    const {
+      startDate,
+      endDate,
+      streetNameFilter,
+      incidentNameFilter,
+      viewType
+    } = QueryString.parse(window.location.search);
+
     this.state = {
       dateQuery: null,
-      startDate: moment().subtract(30, 'days').format('M/D/YYYY'),
-      endDate: moment().format('M/D/YYYY'),
+      startDate: startDate || moment().subtract(30, 'days').format('M/D/YYYY'),
+      endDate: endDate || moment().format('M/D/YYYY'),
       incidents: [],
-      streetNameFilter: '',
-      incidentNameFilter: '',
-      viewType: 'IncidentList',
+      streetNameFilter: streetNameFilter || '',
+      incidentNameFilter: incidentNameFilter || '',
+      viewType: viewType || 'IncidentList',
       loading: false,
     }
 
@@ -133,6 +142,24 @@ export default class App extends React.Component {
 
   }
 
+  componentDidUpdate = (prevProps, prevState) => {
+    this.updatePushState();
+  };
+
+  updatePushState = () => {
+
+    const str = QueryString.stringify({
+      startDate: this.state.startDate,
+      endDate: this.state.endDate,
+      streetNameFilter: this.state.streetNameFilter,
+      incidentNameFilter: this.state.incidentNameFilter,
+      viewType: this.state.viewType,
+    });
+
+    history.pushState({}, '',`/?${str}`);
+
+  };
+
   getFilteredIncidents = (incidents) => {
 
     let {streetNameFilter, incidentNameFilter} = this.state;
@@ -176,7 +203,6 @@ export default class App extends React.Component {
   }
 
   render() {
-
 
     return (
       <section className="App container">
@@ -292,7 +318,7 @@ export default class App extends React.Component {
             <h2 className="panel-title">
               Showing {this.state.incidents.length} incidents from {this.state.startDate} through {this.state.endDate}
               {
-                (this.state.incidentNameFilter || this.state.streetNameFilter) && " with filters " + [this.state.incidentNameFilter, this.state.streetNameFilter].filter(x => x).join(',')
+                (this.state.incidentNameFilter || this.state.streetNameFilter) && " with filter(s) " + [`${this.state.incidentNameFilter}`, `${this.state.streetNameFilter}`].filter(x => x).join(' and ')
               }
               </h2>
           </div>
