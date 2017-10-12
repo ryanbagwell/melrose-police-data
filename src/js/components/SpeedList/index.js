@@ -249,7 +249,7 @@ export default class SpeedList extends React.Component {
 
         </table>
 
-        <small>Updated every 5 minutes. Last updated {moment().format('h:m a')}</small>
+        <small>Updated every 5 minutes. Last updated {moment().format('h:mm a')}</small>
       </div>
     )
 
