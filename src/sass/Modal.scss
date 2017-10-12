@@ -1,0 +1,63 @@
+.Modal {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity .2s ease;
+
+  &.loaded {
+    opacity: 1;
+  }
+
+  &.closed {
+    display: none;
+  }
+}
+
+.Modal__background {
+  background: white;
+  opacity: 0.8;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+}
+
+.Modal__content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 11;
+  max-height: 80vh;
+}
+
+.Modal__content__inner {
+  overflow: auto;
+  max-height: 80vh;
+}
+
+.Modal__content__close {
+  position: absolute;
+  top: -32px;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  display: block;
+  cursor: pointer;
+
+  svg {
+    width: inherit;
+    height: inherit;
+
+    path {
+      fill: black;
+    }
+  }
+}
+

@@ -1,7 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
+import getFirebase from '../../utils/getFirebase';
+import DetailForm from '../DetailForm';
+import Modal from '../Modal';
 
+const fb = getFirebase();
 
 
 export default class IncidentList extends React.Component {
@@ -15,23 +19,32 @@ export default class IncidentList extends React.Component {
 
     this.state = {
       incidents: this.props.incidents,
+      editing: null,
     }
   }
 
   componentWillReceiveProps(nextProps) {
-
     this.setState({
       incidents: nextProps.incidents,
     })
+  }
 
+  handleClick = (incident, e) => {
+    this.setState({
+      editing: incident,
+    })
+  }
+
+  stopEditing = () => {
+    this.setState({
+      editing: false,
+    })
   }
 
   render() {
-
     return (
-      <table className="table">
-
-        <caption>Search results</caption>
+      <table
+        className={`table ${fb.currentUser ? 'authenticated' : ''}`}>
 
         <thead>
           <tr>
@@ -65,7 +78,10 @@ export default class IncidentList extends React.Component {
         {
           this.state.incidents.map((incident, i) => {
             return (
-              <tr key={i}>
+              <tr
+                key={i}
+                onClick={x => this.handleClick(incident) }>
+
                 <td>
                   {incident.date}
                 </td>
@@ -96,6 +112,18 @@ export default class IncidentList extends React.Component {
           })
         }
         </tbody>
+
+        {
+          this.state.editing && (
+            <Modal
+              open={true}
+              afterClose={this.stopEditing}>
+              <DetailForm
+                incident={this.state.editing} />
+            </Modal>
+          )
+        }
+
       </table>
     )
 

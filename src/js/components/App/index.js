@@ -6,6 +6,7 @@ import IncidentList from '../IncidentList';
 import TotalByWeek from '../TotalByWeek';
 import TotalPerShift from '../TotalPerShift';
 import MapView from '../MapView';
+import SpeedList from '../SpeedList';
 import cache from '../../utils/cache';
 import Loading from '../Loading';
 import QueryString from 'query-string';
@@ -302,6 +303,11 @@ export default class App extends React.Component {
                     className="btn btn-default"
                     onClick={this.updateViewType.bind(null, 'MapView')}>Heatmap</button>
 
+                  <button
+                    type="button"
+                    className="btn btn-default"
+                    onClick={this.updateViewType.bind(null, 'SpeedList')}>Current Speeds</button>
+
                 </div>
               </div>
 
@@ -316,10 +322,18 @@ export default class App extends React.Component {
 
           <div className="panel-heading">
             <h2 className="panel-title">
-              Showing {this.state.incidents.length} incidents from {this.state.startDate} through {this.state.endDate}
-              {
-                (this.state.incidentNameFilter || this.state.streetNameFilter) && " with filter(s) " + [`${this.state.incidentNameFilter}`, `${this.state.streetNameFilter}`].filter(x => x).join(' and ')
-              }
+              {this.state.viewType === 'SpeedList' ? (
+                  <span>
+                    Current Speeds
+                  </span>
+                ) : (
+                  <span>
+                    Showing {this.state.incidents.length} incidents from {this.state.startDate} through {this.state.endDate}
+                    {
+                      (this.state.incidentNameFilter || this.state.streetNameFilter) && " with filter(s) " + [`${this.state.incidentNameFilter}`, `${this.state.streetNameFilter}`].filter(x => x).join(' and ')
+                    }
+                  </span>
+                )}
               </h2>
           </div>
 
@@ -349,6 +363,13 @@ export default class App extends React.Component {
               <MapView incidents={this.state.incidents} />
               )
             }
+
+            {
+              this.state.viewType == 'SpeedList' && (
+              <SpeedList />
+              )
+            }
+
           </div>
 
           <Loading />
