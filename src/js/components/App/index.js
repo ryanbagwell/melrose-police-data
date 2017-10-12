@@ -167,6 +167,10 @@ export default class App extends React.Component {
 
     return incidents.filter((item) => {
 
+      if (streetNameFilter && !item.finalLocation) {
+        return false;
+      }
+
       try {
         if (streetNameFilter && item.finalLocation && !item.finalLocation.toLowerCase().includes(streetNameFilter.toLowerCase())) {
           return false;
