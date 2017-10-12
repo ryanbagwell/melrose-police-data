@@ -30,6 +30,8 @@ export default class IncidentList extends React.Component {
   }
 
   handleClick = (incident, e) => {
+    if (!fb.currentUser) return;
+
     this.setState({
       editing: incident,
     })
@@ -42,6 +44,7 @@ export default class IncidentList extends React.Component {
   }
 
   render() {
+
     return (
       <table
         className={`table ${fb.currentUser ? 'authenticated' : ''}`}>
