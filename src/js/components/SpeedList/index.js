@@ -46,9 +46,9 @@ const SEGMENTS = [
   },
   {
     name: 'Franklin Street Westbound',
-    description: 'From Vinton to Ferdinand',
-    origin: 'Franklin Street & Vinton Street, Melrose, MA',
-    destination: 'Franklin Street & Ferdinand Street, Melrose, MA',
+    description: 'From Garden St. to Ferdinand',
+    origin: {lat: 42.469212, lng: -71.072758},
+    destination: {lat: 42.470621, lng: -71.078444},
     speed: 0,
     status: 'ok',
     trend: 'holding steady',
