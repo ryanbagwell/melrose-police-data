@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Modal from '../Modal';
-import getCurrentSpeed from '../../utils/getCurrentSpeed';
-import {withGoogleMap, GoogleMap, Marker, HeatmapLayer} from "react-google-maps";
+//import getCurrentSpeed from '../../utils/getCurrentSpeed';
+//import {withGoogleMap, GoogleMap, Marker, HeatmapLayer} from "react-google-maps";
 import moment from 'moment';
 import honk from '../../utils/honk';
+import getFireBase from '../../utils/getFirebase';
 
 
 const SEGMENTS = [
@@ -96,82 +97,72 @@ export default class SpeedList extends React.Component {
 
   }
 
-  updateSpeeds = () => {
-
-    this.state.segments.map(segment => {
-
-      getCurrentSpeed(segment.origin, segment.destination, (mph) => {
-
-        let newSegments = Object.assign(this.state.segments).map((seg) => {
-
-          if (seg.name === segment.name) {
-
-            if (mph < 30) {
-              seg.status = 'success';
-            } else if (mph >= 30 && mph < 35) {
-              seg.status = 'warning';
-            } else if (mph >= 35) {
-              seg.status = 'danger';
-            }
-
-            seg.prevSpeed = seg.speed;
-            seg.speed = mph;
-
-            let trend = seg.speed - seg.prevSpeed;
-
-            if (seg.prevSpeed === 0) {
-              seg.trend = 'holding steady';
-            } else if (trend > 1) {
-              seg.trend = 'increasing';
-            } else if (trend < -1) {
-              seg.trend = 'decreasing';
-            } else {
-              seg.trend = 'holding steady';
-            }
-
-          }
-
-          return seg;
-
-        });
-
-        let alerts = newSegments.reduce((alerts, seg) => {
-
-          if (seg.trend === 'increasing') {
-            alerts.push(`Speed on ${seg.name} is increasing`);
-          }
-
-          return alerts;
-
-        }, []);
-
-        this.setState({
-          segments: newSegments,
-          alerts: alerts,
-        });
-
-      });
-
-    });
-
-    this.timer = setTimeout(this.updateSpeeds, 60 * 5 * 1000);
-
+  componentWillMount() {
+    this.firebase = getFireBase();
   }
 
   componentDidMount() {
-    this.updateSpeeds();
-    this.timer = setTimeout(this.updateSpeeds, 60 * 5 * 1000);
-  }
 
-  componentWillUnmount() {
-    window.clearTimeout(this.timer);
+    this.firebase.database().ref('speeds').on('value', (snapshot) => {
+      let data = snapshot.val();
+
+      let segments = Object.values(data).map((obj) => {
+
+        let speeds = Object.values(obj).reverse();
+
+        let val = speeds[0],
+          prevVal = speeds[1];
+
+        if (val.speed < 30) {
+          val.status = 'success';
+        } else if (val.speed >= 30 && val.speed < 35) {
+          val.status = 'warning';
+        } else if (val.speed >= 35) {
+          val.status = 'danger';
+        }
+
+        let trend = val.speed - prevVal.speed;
+
+        if (trend > 1) {
+          val.trend = 'increasing';
+        } else if (trend < -1) {
+          val.trend = 'decreasing';
+        } else {
+          val.trend = 'holding steady';
+        }
+
+        val.prevSpeed = prevVal.speed;
+
+        return val;
+
+      });
+
+      let alerts = segments.reduce((alerts, seg) => {
+
+        if (seg.trend === 'increasing') {
+          alerts.push(`Speed on ${seg.name} is increasing`);
+        }
+
+        return alerts;
+
+      }, []);
+
+      this.setState({
+        segments: segments,
+        alerts: alerts,
+      });
+
+      console.info('Firebase updated')
+
+    })
+
   }
 
   componentDidUpdate() {
 
-    if (this.state.alerts.length) {
-      honk();
-    }
+    // if (this.state.alerts.length) {
+    //   honk();
+    // }
   }
 
   render() {
