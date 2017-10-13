@@ -8,82 +8,6 @@ import honk from '../../utils/honk';
 import getFireBase from '../../utils/getFirebase';
 
 
-const SEGMENTS = [
-  {
-    name: 'Upham Street Westbound',
-    description: 'From E. Woodcrest Drive to Ardsmoor Road',
-    origin: {lat: 42.459992, lng: -71.034596},
-    destination: {lat: 42.460704, lng: -71.040024},
-    speed: 0,
-    status: 'ok',
-    trend: 'holding steady',
-  },
-  {
-    name: 'Upham Street Eastbound',
-    description: 'Lincoln to E. Woodcrest',
-    origin: {lat: 42.458298, lng: -71.053017},
-    destination: {lat: 42.460704, lng: -71.040024},
-    speed: 0,
-    status: 'ok',
-    trend: 'holding steady',
-  },
-  {
-    name: 'Howard Street Westbound',
-    description: 'Saugus to Hesseltine Ave',
-    origin: 'Howard Street & Sweetwater Street, Melrose, MA',
-    destination: 'Howard Street & Hesseltine Ave, Melrose, MA',
-    speed: 0,
-    status: 'ok',
-    trend: 'holding steady',
-  },
-  {
-    name: 'Howard Street Eastbound',
-    description: 'From Hesseltine Ave to Saugus',
-    origin: 'Howard Street & Hesseltine Ave, Melrose, MA',
-    destination: 'Howard Street & Sweetwater Street, Melrose, MA',
-    speed: 0,
-    status: 'ok',
-    trend: 'holding steady',
-  },
-  {
-    name: 'Franklin Street Westbound',
-    description: 'From Garden St. to Ferdinand',
-    origin: {lat: 42.469212, lng: -71.072758},
-    destination: {lat: 42.470621, lng: -71.078444},
-    speed: 0,
-    status: 'ok',
-    trend: 'holding steady',
-  },
-  {
-    name: 'Franklin Street Eastbound',
-    description: 'Ferdinand to Garden St.',
-    origin: {lat: 42.470621, lng: -71.078444},
-    destination: {lat: 42.469212, lng: -71.072758},
-    speed: 0,
-    status: 'ok',
-    trend: 'holding steady',
-  },
-  {
-    name: 'Lynn Fells Parkway Westbound',
-    description: 'From 802 Lynn Fells Parkway to 652 Lynn Fells Parkway',
-    origin: '802 Lynn Fells Parkway, Melrose, MA',
-    destination: '652 Lynn Fells Parkway, Melrose, MA',
-    speed: 0,
-    status: 'ok',
-    trend: 'holding steady',
-  },
-  {
-    name: 'Lynn Fells Parkway Eastbound',
-    description: 'From 647 Lynn Fells Parkway to 819 Lynn Fells Parkway',
-    origin: '647 Lynn Fells Parkway, Melrose, MA',
-    destination: '819 Lynn Fells Parkway, Melrose, MA',
-    speed: 0,
-    status: 'ok',
-    trend: 'holding steady',
-  },
-
-];
-
 
 export default class SpeedList extends React.Component {
 
@@ -91,7 +15,7 @@ export default class SpeedList extends React.Component {
     super(props);
 
     this.state = {
-      segments: SEGMENTS,
+      segments: [],
       alerts: [],
     }
 
@@ -111,7 +35,9 @@ export default class SpeedList extends React.Component {
         let speeds = Object.values(obj).reverse();
 
         let val = speeds[0],
-          prevVal = speeds[1];
+          prevVal = speeds[1],
+          last6 = speeds.slice(0, 6);
+
 
         if (val.speed < 30) {
           val.status = 'success';
@@ -132,6 +58,12 @@ export default class SpeedList extends React.Component {
         }
 
         val.prevSpeed = prevVal.speed;
+
+        let total = last6.reduce((total, item) => {
+          return total + item.speed;
+        }, 0);
+
+        val.average = total / 6;
 
         return val;
 
@@ -221,7 +153,10 @@ export default class SpeedList extends React.Component {
 
                       {
                         segment.prevSpeed !== 0 && (
-                          <small>Trend: {segment.trend}</small>
+                          <small>
+                            Trend: {segment.trend}<br />
+                            30-minute average: {segment.average.toFixed(1)} mph
+                          </small>
                         )
                       }
 
