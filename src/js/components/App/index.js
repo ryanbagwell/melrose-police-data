@@ -328,7 +328,7 @@ export default class App extends React.Component {
             <h2 className="panel-title">
               {this.state.viewType === 'SpeedList' ? (
                   <span>
-                    Current Speeds
+                    Current Speeds (Experimental)
                   </span>
                 ) : (
                   <span>
