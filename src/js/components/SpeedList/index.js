@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Modal from '../Modal';
-//import getCurrentSpeed from '../../utils/getCurrentSpeed';
-//import {withGoogleMap, GoogleMap, Marker, HeatmapLayer} from "react-google-maps";
 import moment from 'moment';
 import honk from '../../utils/honk';
 import getFireBase from '../../utils/getFirebase';

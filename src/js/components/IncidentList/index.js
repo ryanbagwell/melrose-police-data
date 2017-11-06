@@ -86,15 +86,15 @@ export default class IncidentList extends React.Component {
                 onClick={x => this.handleClick(incident) }>
 
                 <td>
-                  {incident.date}
+                  {incident.incidentDate}
                 </td>
 
                 <td>
-                  {moment(incident.isotime).format('LT')}
+                  {moment(incident.incidentTime, 'HH:mm:ss').format('LT')}
                 </td>
 
                 <td>
-                  {incident.incidentName}
+                  {incident.incidentTitle}
                 </td>
 
                 <td>
@@ -102,7 +102,7 @@ export default class IncidentList extends React.Component {
                 </td>
 
                 <td>
-                  {incident.finalLocation}
+                  {incident.location.description}
                 </td>
 
                 <td>

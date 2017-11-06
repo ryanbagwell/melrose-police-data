@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import getFirebase from '../../utils/getFirebase';
 import moment from 'moment';
 import IncidentList from '../IncidentList';
 import TotalByWeek from '../TotalByWeek';
@@ -11,7 +10,10 @@ import cache from '../../utils/cache';
 import Loading from '../Loading';
 import QueryString from 'query-string';
 
-const firebase = getFirebase();
+import prom from 'es6-promise';
+prom.polyfill();
+import 'isomorphic-fetch'
+import formatNumber from 'number-formatter'
 
 const today = moment().format('M/D/YYYY');
 
@@ -22,37 +24,42 @@ const dates = {
     label: 'Last 7 Days',
   },
   last14Days: {
-    startDate: moment().subtract(14, 'days').format('M/D/YYYY'),
+    startDate: moment().subtract(14, 'days').format('YYYY-MM-DD'),
     endDate: today,
     label: 'Last 14 Days',
   },
   last30Days: {
-    startDate: moment().subtract(30, 'days').format('M/D/YYYY'),
+    startDate: moment().subtract(30, 'days').format('YYYY-MM-DD'),
     endDate: today,
     label: 'Last 30 Days',
   },
   last60Days: {
-    startDate: moment().subtract(60, 'days').format('M/D/YYYY'),
+    startDate: moment().subtract(60, 'days').format('YYYY-MM-DD'),
     endDate: today,
     label: 'Last 60 Days',
   },
   last90Days: {
-    startDate: moment().subtract(90, 'days').format('M/D/YYYY'),
+    startDate: moment().subtract(90, 'days').format('YYYY-MM-DD'),
     endDate: today,
     label: 'Last 90 Days',
   },
   thisYear: {
-    startDate: `1/1/${moment().format('YYYY')}`,
+    startDate: `${moment().format('YYYY')}-01-01`,
     endDate: today,
     label: 'This Year',
   },
+  lastYear: {
+    startDate: `${moment().subtract(1, 'years').format('YYYY')}-01-01`,
+    endDate: `${moment().subtract(1, 'years').format('YYYY')}-12-31`,
+    label: 'Last Year',
+  },
   last12Months: {
-    startDate: moment().subtract(12, 'months').format('M/D/YYYY'),
+    startDate: moment().subtract(12, 'months').format('YYYY-MM-DD'),
     endDate: today,
     label: 'Last 12 Months',
   },
   all: {
-    startDate: '1/1/2016',
+    startDate: '2016-01-01',
     endDate: today,
     label: 'All Dates',
   },
@@ -75,8 +82,8 @@ export default class App extends React.Component {
 
     this.state = {
       dateQuery: null,
-      startDate: startDate || moment().subtract(30, 'days').format('M/D/YYYY'),
-      endDate: endDate || moment().format('M/D/YYYY'),
+      startDate: startDate || moment().subtract(30, 'days').format('YYYY-MM-DD'),
+      endDate: endDate || moment().format('YYYY-MM-DD'),
       incidents: [],
       streetNameFilter: streetNameFilter || '',
       incidentNameFilter: incidentNameFilter || '',
@@ -92,6 +99,8 @@ export default class App extends React.Component {
 
   componentDidMount() {
     this.query();
+    this.streetNameFilter.value = this.state.streetNameFilter;
+    this.incidentNameFilter.value = this.state.incidentNameFilter;
   }
 
   query = () => {
@@ -100,16 +109,16 @@ export default class App extends React.Component {
       loading: true,
     });
 
-    let startTS = moment(this.state.startDate, ['M/D/YYYY', 'MM/DD/YYYY']).unix();
+    let queryParams = {
+      startDate: moment(this.state.startDate).format('YYYY-MM-DD'),
+      endDate: moment(this.state.endDate).format('YYYY-MM-DD'),
+      incidentTitle: this.state.incidentNameFilter,
+      streetName: this.state.streetNameFilter,
+    }
 
-    let endTS = moment(this.state.endDate, ['M/D/YYYY', 'MM/DD/YYYY']).unix();
-
-    let cacheKey = [
-      this.state.startDate,
-      this.state.endDate,
-      this.state.streetNameFilter,
-      this.state.incidentNameFilter,
-    ].filter(x => x).join('-');
+    let cacheKey = Object.values(queryParams)
+      .filter(x => x)
+      .join('-');
 
     let cachedResults = cache.get(cacheKey);
 
@@ -121,25 +130,24 @@ export default class App extends React.Component {
 
     }
 
-    firebase.database().ref('/reports/')
-      .orderByChild('timestamp')
-      .startAt(startTS, 'timestamp')
-      .endAt(endTS, 'timestamp')
-      .once('value').then((snapshot) => {
+    let url = `//data.cosmicautomation.com/api/1.0/reports/?${QueryString.stringify(queryParams)}&limit=100000`;
 
-      let results = Object.values(snapshot.val() || {});
+    fetch(url)
+        .then(response => {
+            if (response.status >= 400) {
+                throw new Error("Bad response from server");
+            }
+            return response.json();
+        })
+        .then(incidents => {
 
-      if (this.state.streetNameFilter || this.state.incidentNameFilter) {
-        results = this.getFilteredIncidents(results);
-      }
+            this.setState({
+              incidents: incidents.results,
+            }, () => this.setState({loading: false}));
 
-      this.setState({
-        incidents: results,
-      }, () => this.setState({loading: false}));
+            cache.set(cacheKey, incidents.results);
+        });
 
-      cache.set(cacheKey, results);
-
-    });
 
   }
 
@@ -163,27 +171,7 @@ export default class App extends React.Component {
 
   getFilteredIncidents = (incidents) => {
 
-    let {streetNameFilter, incidentNameFilter} = this.state;
-
-    return incidents.filter((item) => {
-
-      if (streetNameFilter && !item.finalLocation) {
-        return false;
-      }
-
-      try {
-        if (streetNameFilter && item.finalLocation && !item.finalLocation.toLowerCase().includes(streetNameFilter.toLowerCase())) {
-          return false;
-        }
-      } catch (e) {
-        return false;
-      }
-
-      if (incidentNameFilter && !item.incidentName.toLowerCase().includes(incidentNameFilter.toLowerCase())) return false;
-
-      return true;
-
-    });
+    return incidents;
 
   }
 
@@ -332,7 +320,7 @@ export default class App extends React.Component {
                   </span>
                 ) : (
                   <span>
-                    Showing {this.state.incidents.length} incidents from {this.state.startDate} through {this.state.endDate}
+                    Showing {formatNumber('#,###.', this.state.incidents.length)} incidents from {moment(this.state.startDate).format('MM/DD/YYYY')} through {moment(this.state.endDate).format('MM/DD/YYYY')}
                     {
                       (this.state.incidentNameFilter || this.state.streetNameFilter) && " with filter(s) " + [`${this.state.incidentNameFilter}`, `${this.state.streetNameFilter}`].filter(x => x).join(' and ')
                     }

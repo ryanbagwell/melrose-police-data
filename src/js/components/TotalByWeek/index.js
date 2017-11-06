@@ -14,7 +14,7 @@ export default class WeeklyDataTable extends React.Component {
 
     let incidentsByWeek = this.props.incidents.reduce((reduced, report, i) => {
 
-      let time = moment(report.isotime);
+      let time = moment(report.incidentDate);
       let week = time.format('w');
       let year = time.format('YYYY');
 

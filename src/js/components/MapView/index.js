@@ -9,13 +9,13 @@ const incidentsToPoints = (incidents) => {
 
   return incidents.reduce((final, incident, i) => {
 
-    if (!incident.position) return final;
+    if (!incident.location.position) return final;
 
-    if (incident.position == 'Rate Limited') return final
+    let {lat, lng} = incident.location.position;
 
-    if (!incident.position.lat || !incident.position.lng) return final;
+    if (!lat || !lng) return final;
 
-    let latlng = new google.maps.LatLng(incident.position.lat, incident.position.lng);
+    let latlng = new google.maps.LatLng(lat, lng);
 
     final.push(latlng);
 
@@ -25,11 +25,12 @@ const incidentsToPoints = (incidents) => {
 
 }
 
-let heatmap;
 
 const setHeatMap = (map, incidents = []) => {
 
   let points = incidentsToPoints(incidents);
+
+  console.log(points)
 
   heatmap = new google.maps.visualization.HeatmapLayer({
     data: points,
@@ -46,7 +47,6 @@ const BaseMap = withGoogleMap(props => (
       ref={props.onMapLoad}
       defaultZoom={14}
       defaultCenter={{lat: 42.4584, lng: -71.0662}}>
-
     </GoogleMap>
 ));
 
@@ -82,12 +82,16 @@ export default class MapView extends React.Component {
 
   componentWillReceiveProps = (nextProps) => {
 
+    let points = incidentsToPoints(nextProps.incidents);
+
     this.setState({
       incidents: nextProps.incidents,
-      mapPoints: incidentsToPoints(nextProps.incidents),
+      mapPoints: points,
     })
 
-    this.heatmap.setData(incidentsToPoints(nextProps.incidents));
+    if (this.heatmap) {
+      this.heatmap.setData(points);
+    };
 
   }
 
