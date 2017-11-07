@@ -130,7 +130,7 @@ export default class App extends React.Component {
 
     }
 
-    let url = `//data.cosmicautomation.com/api/1.0/reports/?${QueryString.stringify(queryParams)}&limit=100000`;
+    let url = `//data.cosmicautomation.com/api/1.0/melrose-log-reports/?${QueryString.stringify(queryParams)}&limit=100000`;
 
     fetch(url)
         .then(response => {
