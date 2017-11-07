@@ -3,7 +3,11 @@ import PropTypes from 'prop-types';
 import Modal from '../Modal';
 import moment from 'moment';
 import honk from '../../utils/honk';
-import getFireBase from '../../utils/getFirebase';
+
+import prom from 'es6-promise';
+prom.polyfill();
+import 'isomorphic-fetch'
+import formatNumber from 'number-formatter'
 
 
 
@@ -19,72 +23,98 @@ export default class SpeedList extends React.Component {
 
   }
 
-  componentWillMount() {
-    this.firebase = getFireBase();
-  }
-
   componentDidMount() {
 
-    this.firebase.database().ref('speeds').on('value', (snapshot) => {
-      let data = snapshot.val();
+    this.refreshSpeeds()
 
-      let segments = Object.values(data).map((obj) => {
+    this.timer = setTimeout(
+      this.refreshSpeeds.bind(this), 1200)
 
-        let speeds = Object.values(obj).reverse();
+    // this.firebase.database().ref('speeds').on('value', (snapshot) => {
+    //   let data = snapshot.val();
 
-        let val = speeds[0],
-          prevVal = speeds[1],
-          last6 = speeds.slice(0, 6);
+    //   let segments = Object.values(data).map((obj) => {
+
+    //     let speeds = Object.values(obj).reverse();
+
+    //     let val = speeds[0],
+    //       prevVal = speeds[1],
+    //       last6 = speeds.slice(0, 6);
 
 
-        if (val.speed < 30) {
-          val.status = 'success';
-        } else if (val.speed >= 30 && val.speed < 35) {
-          val.status = 'warning';
-        } else if (val.speed >= 35) {
-          val.status = 'danger';
-        }
+    //     if (val.speed < 30) {
+    //       val.status = 'success';
+    //     } else if (val.speed >= 30 && val.speed < 35) {
+    //       val.status = 'warning';
+    //     } else if (val.speed >= 35) {
+    //       val.status = 'danger';
+    //     }
 
-        let trend = val.speed - prevVal.speed;
+    //     let trend = val.speed - prevVal.speed;
 
-        if (trend > 1) {
-          val.trend = 'increasing';
-        } else if (trend < -1) {
-          val.trend = 'decreasing';
-        } else {
-          val.trend = 'holding steady';
-        }
+    //     if (trend > 1) {
+    //       val.trend = 'increasing';
+    //     } else if (trend < -1) {
+    //       val.trend = 'decreasing';
+    //     } else {
+    //       val.trend = 'holding steady';
+    //     }
 
-        val.prevSpeed = prevVal.speed;
+    //     val.prevSpeed = prevVal.speed;
 
-        let total = last6.reduce((total, item) => {
-          return total + item.speed;
-        }, 0);
+    //     let total = last6.reduce((total, item) => {
+    //       return total + item.speed;
+    //     }, 0);
 
-        val.average = total / 6;
+    //     val.average = total / 6;
 
-        return val;
+    //     return val;
+
+    //   });
+
+    //   let alerts = segments.reduce((alerts, seg) => {
+
+    //     if (seg.trend === 'increasing') {
+    //       alerts.push(`Speed on ${seg.name} is increasing`);
+    //     }
+
+    //     return alerts;
+
+    //   }, []);
+
+    //   this.setState({
+    //     segments: segments,
+    //     alerts: alerts,
+    //   });
+
+    //   console.info('Firebase updated')
+
+    // })
+
+  }
+
+  refreshSpeeds() {
+
+    let url = `//data.cosmicautomation.com/api/1.0/speed-data/`;
+
+    fetch(url)
+      .then(response => {
+          if (response.status >= 400) {
+              throw new Error("Bad response from server");
+          }
+          return response.json();
+      })
+      .then(response => {
+
+        this.setState({
+          segments: response.results,
+          alerts: [],
+        });
+
+        this.timer = setTimeout(
+          this.refreshSpeeds.bind(this), 1200)
 
       });
-
-      let alerts = segments.reduce((alerts, seg) => {
-
-        if (seg.trend === 'increasing') {
-          alerts.push(`Speed on ${seg.name} is increasing`);
-        }
-
-        return alerts;
-
-      }, []);
-
-      this.setState({
-        segments: segments,
-        alerts: alerts,
-      });
-
-      console.info('Firebase updated')
-
-    })
 
   }
 
@@ -135,6 +165,16 @@ export default class SpeedList extends React.Component {
           {
             this.state.segments.map((segment) => {
 
+              let status = 'danger';
+
+              let diff = segment.lastSpeed - segment.speedLimit;
+
+              if (diff <= 3) {
+                status = 'success';
+              } else if (diff <= 10) {
+                status = 'warning';
+              }
+
               return (
                 <tr>
                   <td>
@@ -143,18 +183,15 @@ export default class SpeedList extends React.Component {
                   </td>
 
                   <td className="">
-                    <div className={`panel-body bg-${segment.status}`}>
+                    <div className={`panel-body bg-${status}`}>
 
                       <p className="lead">
-                        {segment.speed.toFixed(1)} mph
+                        {segment.lastSpeed.toFixed(1)} mph
                       </p>
 
-                      {
-                        segment.prevSpeed !== 0 && (
-                          <small>
-                            Trend: {segment.trend}<br />
-                            30-minute average: {segment.average.toFixed(1)} mph
-                          </small>
+                      { segment.tenMinuteDailyAverage && (
+
+                        <small>Usually {segment.tenMinuteDailyAverage.toFixed(1)} mph at this time of day</small>
                         )
                       }
 
