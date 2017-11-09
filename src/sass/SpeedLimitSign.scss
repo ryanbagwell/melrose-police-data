@@ -1,0 +1,18 @@
+@font-face {
+    font-family: HighwayCondensed;
+    src: url(../../fonts/highway_gothic/HWYGCOND.TTF);
+}
+
+@font-face {
+    font-family: HighwayBold;
+    src: url(../../fonts/highway_gothic/HWYGCOND.TTF);
+}
+
+.SpeedLimitSign {
+  background: white;
+  border: 1px solid black;
+  border-radius: 6%;
+  width: 100px;
+  height: 121px;
+  text-align: center;
+}
