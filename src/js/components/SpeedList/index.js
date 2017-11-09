@@ -31,6 +31,10 @@ export default class SpeedList extends React.Component {
       this.refreshSpeeds.bind(this), 1200)
   }
 
+  componentWillUnmount() {
+    clearTimeout(this.timer)
+  }
+
   refreshSpeeds() {
 
     let url = `//data.cosmicautomation.com/api/1.0/speed-data/`;
