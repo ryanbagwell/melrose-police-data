@@ -15,11 +15,11 @@ prom.polyfill();
 import 'isomorphic-fetch'
 import formatNumber from 'number-formatter'
 
-const today = moment().format('M/D/YYYY');
+const today = moment().format('YYYY-MM-DD');
 
 const dates = {
   last7Days: {
-    startDate: moment().subtract(7, 'days').format('M/D/YYYY'),
+    startDate: moment().subtract(7, 'days').format('YYYY-MM-DD'),
     endDate: today,
     label: 'Last 7 Days',
   },
@@ -346,7 +346,10 @@ export default class App extends React.Component {
 
             {
               this.state.viewType == 'TotalPerShift' && (
-              <TotalPerShift incidents={this.state.incidents} />
+              <TotalPerShift
+                startDate={this.state.startDate}
+                endDate={this.state.endDate}
+                incidents={this.state.incidents} />
               )
             }
 

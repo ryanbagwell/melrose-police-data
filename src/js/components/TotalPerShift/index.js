@@ -3,24 +3,46 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 
 const SHIFTS = {
-  FIRST: '7:45 a.m. - 3:45 p.m.',
-  SECOND: '3:45 p.m. - 11:45 p.m.',
-  THIRD: '11:45 p.m. - 7:45 a.m.',
+  FIRST: {
+    start: moment('07:45:00', 'HH:mm:ss'),
+    end: moment('15:45:00', 'HH:mm:ss'),
+  },
+  SECOND: {
+    start: moment('15:45:00', 'HH:mm:ss'),
+    end: moment('23:45:00', 'HH:mm:ss'),
+  },
+  THIRD: {
+    start: moment('23:45:00', 'HH:mm:ss').subtract(1, 'day'),
+    end: moment('07:45:00', 'HH:mm:ss'),
+  },
 }
-
 
 export default class TotalPerShift extends React.Component {
 
   static propTypes = {
     incidents: PropTypes.array,
+    startDate: PropTypes.string,
+    endDate: PropTypes.string,
   }
 
   render() {
 
+    let totalDays = moment(this.props.endDate, 'YYYY-MM-DD').diff(moment(this.props.startDate, 'YYYY-MM-DD'), 'days');
+
+    if (this.props.incidents.length === 0) return null;
+
     let incidentsByShift = this.props.incidents.reduce((reduced, incident, i) => {
 
-      let keys = Object.keys('reduced'),
-        {shift} = incident;
+      let shift,
+        incidentTime = moment(incident.incidentTime, 'HH:mm:ss')
+
+      Object.keys(SHIFTS).map((shiftName) => {
+        let shiftDetails = SHIFTS[shiftName];
+
+        if (incidentTime.isAfter(shiftDetails.start) && incidentTime.isBefore(shiftDetails.end)) {
+          shift = shiftName
+        }
+      })
 
       if (!shift) return reduced;
 
@@ -44,10 +66,6 @@ export default class TotalPerShift extends React.Component {
             </th>
 
             <th>
-              Time
-            </th>
-
-            <th>
               Total
             </th>
 
@@ -55,32 +73,38 @@ export default class TotalPerShift extends React.Component {
               %
             </th>
 
+            <th>
+              Per ptl. shift
+            </th>
+
           </tr>
         </thead>
 
         <tbody className="table-striped">
         {
-          Object.keys(SHIFTS).map((shift, i) => {
 
-            let shiftTotal = incidentsByShift[shift];
+          Object.keys(SHIFTS).map((shiftName, i) => {
+
+            let {start, end} = SHIFTS[shiftName]
 
             return (
               <tr key={i}>
                 <td>
-                  {shift}
+                  {start.format('h:mm a')} - {end.format('h:mm a')}
                 </td>
 
                 <td>
-                  {SHIFTS[shift]}
+                  {incidentsByShift[shiftName]}
                 </td>
 
                 <td>
-                  {shiftTotal}
+                  {(incidentsByShift[shiftName] / grandTotal * 100).toFixed(1)}%
                 </td>
 
                 <td>
-                  {(shiftTotal / grandTotal * 100).toPrecision(2)}%
+                  {(incidentsByShift[shiftName] / (3 * totalDays)).toFixed(1)}
                 </td>
+
               </tr>
             )
 
