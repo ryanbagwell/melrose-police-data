@@ -27,8 +27,6 @@ export default class SpeedList extends React.Component {
 
     this.refreshSpeeds()
 
-    this.timer = setTimeout(
-      this.refreshSpeeds.bind(this), 1200)
   }
 
   componentWillUnmount() {
@@ -52,6 +50,8 @@ export default class SpeedList extends React.Component {
           segments: response.results,
           alerts: [],
         });
+
+        clearTimeout(this.timer)
 
         this.timer = setTimeout(
           this.refreshSpeeds.bind(this), 1200)
