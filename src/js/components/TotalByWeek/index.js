@@ -3,6 +3,32 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 
 
+const WeekRow = (props) => {
+
+  return (
+    <tr>
+      <td>
+        {props.year}
+      </td>
+
+      <td>
+        {props.week}
+      </td>
+
+      <td>
+        {moment(props.week, 'w').format('MMM D')}
+      </td>
+
+      <td>{props.numIncidents}</td>
+
+      <td>{(props.numIncidents / 63).toPrecision(2)}</td>
+
+    </tr>
+  )
+
+}
+
+
 
 export default class WeeklyDataTable extends React.Component {
 
@@ -64,30 +90,30 @@ export default class WeeklyDataTable extends React.Component {
 
             let weeks = incidentsByWeek[year];
 
-            return Object.keys(weeks).map((week, i) => {
+            let weekNumbers = Object.keys(weeks);
 
-              let numIncidents = weeks[week].length;
+            let start = parseInt(weekNumbers[0]),
+              end = parseInt(weekNumbers[weekNumbers.length - 1]);
 
-              return (
-                <tr>
-                  <td>
-                    {year}
-                  </td>
+            let weeksWithBlanks = {};
 
-                  <td>
-                    {week}
-                  </td>
+            while(start <= end) {
+              let key = start.toString();
 
-                  <td>
-                    {moment(week, 'w').format('MMM D')}
-                  </td>
+              if (weeks[key]) {
+                weeksWithBlanks[key] = weeks[key].length;
+              } else {
+                weeksWithBlanks[key] = 0
+              }
 
-                  <td>{numIncidents}</td>
+              start++;
+            }
 
-                  <td>{(numIncidents / 63).toPrecision(2)}</td>
+            return Object.keys(weeksWithBlanks).map((week, i) => {
 
-                </tr>
-              )
+              let numIncidents = weeksWithBlanks[week];
+
+              return  <WeekRow {...{year, week, numIncidents}} />
 
             });
 
