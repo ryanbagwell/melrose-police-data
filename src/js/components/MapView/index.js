@@ -63,7 +63,7 @@ export default class MapView extends React.Component {
             ref={x => this.instance = x}
             incidents={this.state.incidents}
             loadingElement={<div style={{ height: `100%` }} />}
-            googleMapURL="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places,visualization"
+            googleMapURL="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places,visualization&key=AIzaSyDq4M2J5jyKxYipxkTH0fs9Npq_NlV1VGM"
             containerElement={
               <div style={{
                 width: '100%',
