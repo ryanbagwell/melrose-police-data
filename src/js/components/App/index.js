@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import IncidentList from '../IncidentList';
 import TotalByWeek from '../TotalByWeek';
+import TotalByMonth from '../TotalByMonth';
 import TotalPerShift from '../TotalPerShift';
 import MapView from '../MapView';
 import SpeedList from '../SpeedList';
@@ -123,11 +124,9 @@ export default class App extends React.Component {
     let cachedResults = cache.get(cacheKey);
 
     if (cachedResults) {
-
       return this.setState({
         incidents: cachedResults,
       }, () => this.setState({loading: false}));
-
     }
 
     let url = `//data.cosmicautomation.com/api/1.0/melrose-log-reports/?${QueryString.stringify(queryParams)}&limit=100000`;
@@ -285,6 +284,12 @@ export default class App extends React.Component {
                     className="btn btn-default"
                     onClick={this.updateViewType.bind(null, 'TotalByWeek')}>Total by Week</button>
 
+
+                  <button
+                    type="button"
+                    className="btn btn-default"
+                    onClick={this.updateViewType.bind(null, 'TotalByMonth')}>Total by month</button>
+
                   <button
                     type="button"
                     className="btn btn-default"
@@ -341,6 +346,15 @@ export default class App extends React.Component {
             {
               this.state.viewType == 'TotalByWeek' && (
               <TotalByWeek
+                incidents={this.state.incidents}
+                startDate={this.state.startDate}
+                endDate={this.state.endDate} />
+              )
+            }
+
+            {
+              this.state.viewType == 'TotalByMonth' && (
+              <TotalByMonth
                 incidents={this.state.incidents}
                 startDate={this.state.startDate}
                 endDate={this.state.endDate} />
