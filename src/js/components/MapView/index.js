@@ -1,55 +1,37 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {withGoogleMap, GoogleMap, Marker, HeatmapLayer} from "react-google-maps";
+import {withScriptjs, withGoogleMap, GoogleMap, Marker} from "react-google-maps";
 import cache from '../../utils/cache';
+import HeatmapLayer from "react-google-maps/lib/components/visualization/HeatmapLayer";
 
 
 
 const incidentsToPoints = (incidents) => {
 
-  return incidents.reduce((final, incident, i) => {
-
-    if (!incident.location.position) return final;
-
+  return incidents.map((incident) => {
     let {lat, lng} = incident.location.position;
-
-    if (!lat || !lng) return final;
-
-    let latlng = new google.maps.LatLng(lat, lng);
-
-    final.push(latlng);
-
-    return final;
-
-  }, []);
-
-}
-
-
-const setHeatMap = (map, incidents = []) => {
-
-  let points = incidentsToPoints(incidents);
-
-  console.log(points)
-
-  heatmap = new google.maps.visualization.HeatmapLayer({
-    data: points,
-    map: map,
-    radius: 20,
+    return new google.maps.LatLng(lat, lng);
   });
-
 }
 
-
-const BaseMap = withGoogleMap(props => (
-
-    <GoogleMap
-      ref={props.onMapLoad}
-      defaultZoom={14}
-      defaultCenter={{lat: 42.4584, lng: -71.0662}}>
-    </GoogleMap>
+const BaseMap = withScriptjs(withGoogleMap(props => {
+    return (
+      <GoogleMap
+        defaultZoom={14}
+        defaultCenter={{lat: 42.4584, lng: -71.0662}}>
+        <HeatmapLayer
+          data={incidentsToPoints(props.incidents)}
+          options={{
+            radius: 22,
+            opacity: 0.8,
+            maxIntensity: 2,
+            dissipating: true,
+          }}
+        />
+      </GoogleMap>
+    )
+  }
 ));
-
 
 export default class MapView extends React.Component {
 
@@ -62,78 +44,51 @@ export default class MapView extends React.Component {
 
     this.state = {
       incidents: props.incidents,
-      mapPoints: incidentsToPoints(props.incidents),
     }
 
   }
 
-  onMapLoad = () => {
-
-    try {
-      this.heatmap = new google.maps.visualization.HeatmapLayer({
-        data: this.state.mapPoints,
-        map: this.instance.state.map,
-        radius: 18,
-        opacity: 0.8,
-      });
-    } catch (e){}
-
-  }
-
-  componentWillReceiveProps = (nextProps) => {
-
-    let points = incidentsToPoints(nextProps.incidents);
-
+  componentWillReceiveProps = (nextProps, nextState) => {
     this.setState({
-      incidents: nextProps.incidents,
-      mapPoints: points,
-    })
-
-    if (this.heatmap) {
-      this.heatmap.setData(points);
-    };
-
+      incidents: nextProps.incidents.filter(i => i.location.position),
+    });
   }
 
   render() {
 
     return (
       <div>
-        {
-          this.state.mapPoints.length < 1000 ? (
-            <span>
-            <BaseMap
-              ref={x => this.instance = x}
-              onMapLoad={this.onMapLoad}
-              incidents={this.state.incidents}
-              containerElement={
-                <div style={{
-                  width: '100%',
-                  height: 0,
-                  paddingBottom: '50%',
-                  position: 'relative',
-                }} />
-              }
-              mapElement={
-                <div style={{
-                  position: 'absolute',
-                  width: '100%',
-                  height: '100%',
-                  top: 0,
-                  left: 0,
-                 }} />
-              } />
-
-             <h4>*Showing {this.state.mapPoints.length} incidents with position data</h4>
-            </span>
-          ) : (
-            <span>
-              <h2 className="text-center">Too many incidents selected</h2>
-              <p className="text-center">Heatmaps can take up to 1,000 points. Please filter your selections.</p>
-            </span>
-          )
-        }
-
+        <span>
+          <BaseMap
+            ref={x => this.instance = x}
+            incidents={this.state.incidents}
+            loadingElement={<div style={{ height: `100%` }} />}
+            googleMapURL="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places,visualization"
+            containerElement={
+              <div style={{
+                width: '100%',
+                height: 0,
+                paddingBottom: '50%',
+                position: 'relative',
+              }} />
+            }
+            mapElement={
+              <div style={{
+                position: 'absolute',
+                width: '100%',
+                height: '100%',
+                top: 0,
+                left: 0,
+               }} />
+            }>
+          </BaseMap>
+          {this.state.incidents.length && (
+            <h4>
+              *Showing {this.state.incidents.length} incidents with position data
+            </h4>
+           )
+          }
+        </span>
 
       </div>
 

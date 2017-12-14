@@ -34,6 +34,8 @@ export default class WeeklyDataTable extends React.Component {
 
   static propTypes = {
     incidents: PropTypes.array,
+    startDate: PropTypes.string,
+    endDate: PropTypes.string,
   }
 
   render() {

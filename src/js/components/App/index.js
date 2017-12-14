@@ -340,7 +340,10 @@ export default class App extends React.Component {
 
             {
               this.state.viewType == 'TotalByWeek' && (
-              <TotalByWeek incidents={this.state.incidents} />
+              <TotalByWeek
+                incidents={this.state.incidents}
+                startDate={this.state.startDate}
+                endDate={this.state.endDate} />
               )
             }
 
