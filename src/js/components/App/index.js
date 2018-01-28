@@ -298,7 +298,7 @@ export default class App extends React.Component {
                   <button
                     type="button"
                     className="btn btn-default"
-                    onClick={this.updateViewType.bind(null, 'MapView')}>Heatmap</button>
+                    onClick={this.updateViewType.bind(null, 'MapView')}>Map</button>
 
                   <button
                     type="button"
