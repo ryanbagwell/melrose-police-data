@@ -6,7 +6,6 @@ import TotalByWeek from '../TotalByWeek';
 import TotalByMonth from '../TotalByMonth';
 import TotalPerShift from '../TotalPerShift';
 import MapView from '../MapView';
-import SpeedList from '../SpeedList';
 import cache from '../../utils/cache';
 import Loading from '../Loading';
 import QueryString from 'query-string';
@@ -78,6 +77,7 @@ export default class App extends React.Component {
       endDate,
       streetNameFilter,
       incidentNameFilter,
+      descriptionFilter,
       viewType
     } = QueryString.parse(window.location.search);
 
@@ -88,6 +88,7 @@ export default class App extends React.Component {
       incidents: [],
       streetNameFilter: streetNameFilter || '',
       incidentNameFilter: incidentNameFilter || '',
+      descriptionFilter: descriptionFilter || '',
       viewType: viewType || 'IncidentList',
       loading: false,
     }
@@ -102,6 +103,7 @@ export default class App extends React.Component {
     this.query();
     this.streetNameFilter.value = this.state.streetNameFilter;
     this.incidentNameFilter.value = this.state.incidentNameFilter;
+    this.descriptionFilter.value = this.state.descriptionFilter;
   }
 
   query = () => {
@@ -115,6 +117,7 @@ export default class App extends React.Component {
       endDate: moment(this.state.endDate).format('YYYY-MM-DD'),
       incidentTitle: this.state.incidentNameFilter,
       streetName: this.state.streetNameFilter,
+      description: this.state.descriptionFilter,
     }
 
     let cacheKey = Object.values(queryParams)
@@ -180,6 +183,7 @@ export default class App extends React.Component {
     this.setState({
       incidentNameFilter: this.incidentNameFilter.value,
       streetNameFilter: this.streetNameFilter.value,
+      descriptionFilter: this.descriptionFilter.value,
     }, this.query);
 
   }
@@ -267,6 +271,23 @@ export default class App extends React.Component {
                 </div>
               </div>
 
+              <div className="form-group">
+                <div className="input-group">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Incident Description"
+                    ref={x => this.descriptionFilter = x} />
+                  <span className="input-group-btn">
+                    <button
+                      className="btn btn-default"
+                      type="button"
+                      onClick={this.updateFilters}>Update</button>
+                  </span>
+                </div>
+              </div>
+
+
 
               <div className="form-group">
 
@@ -300,11 +321,6 @@ export default class App extends React.Component {
                     className="btn btn-default"
                     onClick={this.updateViewType.bind(null, 'MapView')}>Map</button>
 
-                  <button
-                    type="button"
-                    className="btn btn-default"
-                    onClick={this.updateViewType.bind(null, 'SpeedList')}>Current Speeds</button>
-
                 </div>
               </div>
 
@@ -319,19 +335,13 @@ export default class App extends React.Component {
 
           <div className="panel-heading">
             <h2 className="panel-title">
-              {this.state.viewType === 'SpeedList' ? (
-                  <span>
-                    Current Speeds (Experimental)
-                  </span>
-                ) : (
-                  <span>
-                    Showing {formatNumber('#,###.', this.state.incidents.length)} incidents from {moment(this.state.startDate).format('MM/DD/YYYY')} through {moment(this.state.endDate).format('MM/DD/YYYY')}
-                    {
-                      (this.state.incidentNameFilter || this.state.streetNameFilter) && " with filter(s) " + [`${this.state.incidentNameFilter}`, `${this.state.streetNameFilter}`].filter(x => x).join(' and ')
-                    }
-                  </span>
-                )}
-              </h2>
+                <span>
+                  Showing {formatNumber('#,###.', this.state.incidents.length)} incidents from {moment(this.state.startDate).format('MM/DD/YYYY')} through {moment(this.state.endDate).format('MM/DD/YYYY')}
+                  {
+                    (this.state.incidentNameFilter || this.state.streetNameFilter) && " with filter(s) " + [`${this.state.incidentNameFilter}`, `${this.state.streetNameFilter}`].filter(x => x).join(' and ')
+                  }
+                </span>
+            </h2>
           </div>
 
           <div
@@ -373,12 +383,6 @@ export default class App extends React.Component {
             {
               this.state.viewType == 'MapView' && (
               <MapView incidents={this.state.incidents} />
-              )
-            }
-
-            {
-              this.state.viewType == 'SpeedList' && (
-              <SpeedList />
               )
             }
 
