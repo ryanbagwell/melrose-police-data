@@ -21,6 +21,17 @@ const WeekRow = (props) => {
 
       <td>{props.numIncidents}</td>
 
+      <td>
+        <span style={{
+          display: 'block',
+          height: '20',
+          background: '#B8101F',
+          width: `${props.numIncidents / props.maxIncidents * 100}%`,
+
+        }} />
+
+      </td>
+
       <td>{(props.numIncidents / 63).toPrecision(2)}</td>
 
     </tr>
@@ -80,6 +91,10 @@ export default class WeeklyDataTable extends React.Component {
             </th>
 
             <th>
+              Graph
+            </th>
+
+            <th>
               Avg. Per<br />Ptl. Shift
             </th>
 
@@ -111,11 +126,13 @@ export default class WeeklyDataTable extends React.Component {
               start++;
             }
 
+            let maxIncidents = Math.max(...Object.values(weeksWithBlanks))
+
             return Object.keys(weeksWithBlanks).map((week, i) => {
 
               let numIncidents = weeksWithBlanks[week];
 
-              return  <WeekRow {...{year, week, numIncidents}} />
+              return  <WeekRow {...{year, week, numIncidents, maxIncidents}} />
 
             });
 
