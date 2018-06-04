@@ -16,7 +16,19 @@ const MonthRow = (props) => {
         {moment(`${props.month}/01/2017`).format('MMM')}
       </td>
 
-      <td>{formatNumber('#,###.', props.numIncidents)}</td>
+      <td>
+        {formatNumber('#,###.', props.numIncidents)}
+      </td>
+
+      <td>
+        <span style={{
+          display: 'inline-block',
+          height: '20',
+          background: '#B8101F',
+          width: `${props.numIncidents / props.maxIncidents * 100}%`,
+
+        }} />
+      </td>
 
     </tr>
   )
@@ -70,6 +82,10 @@ export default class MonthlyDataTable extends React.Component {
               Total Incidents
             </th>
 
+            <th>
+              Graph
+            </th>
+
           </tr>
         </thead>
 
@@ -79,11 +95,16 @@ export default class MonthlyDataTable extends React.Component {
 
             let months = incidentsByMonth[year];
 
+            console.log(months);
+
+            let maxIncidents = Math.max(...Object.values(months).map(x => x.length));
+
             return Object.keys(months).map((month, i) => {
               return (<MonthRow
                         year={year}
                         month={month}
-                        numIncidents={months[month].length} /> );
+                        numIncidents={months[month].length}
+                        maxIncidents={maxIncidents} /> );
             });
 
           })
