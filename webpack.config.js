@@ -24,6 +24,10 @@ export default {
         exclude: /node_modules/,
       },
       {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'],
+      },
+      {
         test: /\.(eot|woff2||woff|ttf)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
         use: 'url-loader',
       },

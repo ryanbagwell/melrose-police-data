@@ -9,11 +9,15 @@ import MapView from '../MapView';
 import cache from '../../utils/cache';
 import Loading from '../Loading';
 import QueryString from 'query-string';
+import DatePicker from 'react-datepicker';
 
 import prom from 'es6-promise';
 prom.polyfill();
 import 'isomorphic-fetch'
 import formatNumber from 'number-formatter'
+
+import styles from 'react-datepicker/dist/react-datepicker.css';
+
 
 const today = moment().format('YYYY-MM-DD');
 
@@ -91,12 +95,18 @@ export default class App extends React.Component {
       descriptionFilter: descriptionFilter || '',
       viewType: viewType || 'IncidentList',
       loading: false,
+      datepickerStartDate: startDate || moment().subtract(30, 'days').format('YYYY-MM-DD'),
+      datepickerEndDate:  endDate || moment().format('YYYY-MM-DD'),
     }
 
   }
 
   changeDateQuery = (dateRange) => {
-    this.setState(dateRange, this.query);
+    this.setState({
+      ...dateRange,
+      datepickerStartDate: dateRange.startDate,
+      datepickerEndDate: dateRange.endDate,
+    }, this.query);
   }
 
   componentDidMount() {
@@ -181,9 +191,12 @@ export default class App extends React.Component {
     e.preventDefault();
 
     this.setState({
+      dateRange: null,
       incidentNameFilter: this.incidentNameFilter.value,
       streetNameFilter: this.streetNameFilter.value,
       descriptionFilter: this.descriptionFilter.value,
+      startDate: moment(this.state.datepickerStartDate).format('YYYY-MM-DD'),
+      endDate: moment(this.state.datepickerEndDate).format('YYYY-MM-DD'),
     }, this.query);
 
   }
@@ -196,6 +209,21 @@ export default class App extends React.Component {
     this.setState({
       viewType: viewType || IncidentList,
     });
+  }
+
+  updateDatepicker = (type, date) => {
+
+    if (type === 'start') {
+      this.setState({
+        datepickerStartDate:  date.format('YYYY-MM-DD'),
+      })
+    }
+
+    if (type === 'end') {
+      this.setState({
+        datepickerEndDate: date.format('YYYY-MM-DD'),
+      })
+    }
   }
 
   render() {
@@ -239,55 +267,72 @@ export default class App extends React.Component {
                 </div>
               </div>
 
-              <div className="form-group">
-                <div className="input-group">
+              <div className="row form-group">
+
+                <div className="col-md-6">
+
                   <input
                     type="text"
                     className="form-control"
                     placeholder="Street Name (e.g. howard)"
                     ref={x => this.streetNameFilter = x} />
-                  <span className="input-group-btn">
-                    <button
-                      className="btn btn-default"
-                      type="button"
-                      onClick={this.updateFilters}>Update</button>
-                  </span>
-                </div>
-              </div>
 
-              <div className="form-group">
-                <div className="input-group">
+                </div>
+
+                <div className="col-md-6">
                   <input
                     type="text"
                     className="form-control"
                     placeholder="Incident Name (e.g. accident)"
                     ref={x => this.incidentNameFilter = x} />
-                  <span className="input-group-btn">
-                    <button
-                      className="btn btn-default"
-                      type="button"
-                      onClick={this.updateFilters}>Update</button>
-                  </span>
                 </div>
+
               </div>
 
-              <div className="form-group">
-                <div className="input-group">
+
+              <div className="row form-group">
+                <div className="col-md-6">
+
                   <input
                     type="text"
                     className="form-control"
                     placeholder="Incident Description"
                     ref={x => this.descriptionFilter = x} />
-                  <span className="input-group-btn">
-                    <button
-                      className="btn btn-default"
-                      type="button"
-                      onClick={this.updateFilters}>Update</button>
-                  </span>
+
                 </div>
+
+
+                <div
+                  className="col-md-6 datepicker-column">
+
+                  <DatePicker
+                    onChange={this.updateDatepicker.bind(this, 'start')}
+                    selected={moment(this.state.datepickerStartDate)}
+                    placeholderText="Start Date"
+                    ref={x => this.startDateFilter = x} />
+
+                  <span>to</span>
+
+                  <DatePicker
+                    onChange={this.updateDatepicker.bind(this, 'end')}
+                    selected={moment(this.state.datepickerEndDate)}
+                    placeholderText="End Date"
+                    ref={x => this.endDateFilter = x} />
+
+                </div>
+
               </div>
 
+              <div className="row">
+                <div className="col-md-8" />
 
+                <div className="col-md-4 text-right">
+                  <button
+                    type="submit"
+                    className="btn btn-default"
+                    onClick={this.updateFilters}>Submit</button>
+                </div>
+              </div>
 
               <div className="form-group">
 

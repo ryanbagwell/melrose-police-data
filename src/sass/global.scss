@@ -1,3 +1,5 @@
+@import '../../node_modules/bootstrap/dist/css/bootstrap.min';
+@import '../../node_modules/bootstrap/dist/css/bootstrap-theme.min';
 @import '_loading.scss';
 
 .Loading {
@@ -38,6 +40,15 @@
   }
 }
 
+.react-datepicker-wrapper input {
+  @extend .form-control;
+}
+
+.datepicker-column {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
 @import 'Modal.scss';
 @import 'DetailForm.scss';

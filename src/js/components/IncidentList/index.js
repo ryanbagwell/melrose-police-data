@@ -46,88 +46,90 @@ export default class IncidentList extends React.Component {
   render() {
 
     return (
-      <table
-        className={`table ${fb.currentUser ? 'authenticated' : ''}`}>
+      <div className="table-responsive">
+        <table
+          className={`table ${fb.currentUser ? 'authenticated' : ''}`}>
 
-        <thead>
-          <tr>
-            <th>
-              Date
-            </th>
+          <thead>
+            <tr>
+              <th>
+                Date
+              </th>
 
-            <th>
-              Time
-            </th>
+              <th>
+                Time
+              </th>
 
-            <th>
-              Type
-            </th>
+              <th>
+                Type
+              </th>
 
-            <th>
-              Incident No.
-            </th>
+              <th>
+                Incident No.
+              </th>
 
-            <th>
-              Location
-            </th>
+              <th>
+                Location
+              </th>
 
-            <th>
-              Details
-            </th>
-          </tr>
-        </thead>
+              <th>
+                Details
+              </th>
+            </tr>
+          </thead>
 
-        <tbody className="table-striped">
-        {
-          this.state.incidents.map((incident, i) => {
-            return (
-              <tr
-                key={i}
-                onClick={x => this.handleClick(incident) }>
+          <tbody className="table-striped">
+          {
+            this.state.incidents.map((incident, i) => {
+              return (
+                <tr
+                  key={i}
+                  onClick={x => this.handleClick(incident) }>
 
-                <td>
-                  {incident.incidentDate}
-                </td>
+                  <td>
+                    {incident.incidentDate}
+                  </td>
 
-                <td>
-                  {moment(incident.incidentTime, 'HH:mm:ss').format('LT')}
-                </td>
+                  <td>
+                    {moment(incident.incidentTime, 'HH:mm:ss').format('LT')}
+                  </td>
 
-                <td>
-                  {incident.incidentTitle}
-                </td>
+                  <td>
+                    {incident.incidentTitle}
+                  </td>
 
-                <td>
-                  {incident.incidentNumber}
-                </td>
+                  <td>
+                    {incident.incidentNumber}
+                  </td>
 
-                <td>
-                  {incident.location.description}
-                </td>
+                  <td>
+                    {incident.location.description}
+                  </td>
 
-                <td>
-                  {incident.narrative}
-                </td>
+                  <td>
+                    {incident.narrative}
+                  </td>
 
-              </tr>
-            );
+                </tr>
+              );
 
-          })
-        }
-        </tbody>
+            })
+          }
+          </tbody>
 
-        {
-          this.state.editing && (
-            <Modal
-              open={true}
-              afterClose={this.stopEditing}>
-              <DetailForm
-                incident={this.state.editing} />
-            </Modal>
-          )
-        }
+          {
+            this.state.editing && (
+              <Modal
+                open={true}
+                afterClose={this.stopEditing}>
+                <DetailForm
+                  incident={this.state.editing} />
+              </Modal>
+            )
+          }
 
-      </table>
+        </table>
+      </div>
     )
 
   }
