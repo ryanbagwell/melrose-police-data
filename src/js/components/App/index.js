@@ -267,7 +267,7 @@ export default class App extends React.Component {
                 </div>
               </div>
 
-              <div className="row form-group">
+              <div className="row">
 
                 <div className="col-md-6">
 
@@ -290,7 +290,7 @@ export default class App extends React.Component {
               </div>
 
 
-              <div className="row form-group">
+              <div className="row">
                 <div className="col-md-6">
 
                   <input
@@ -330,7 +330,7 @@ export default class App extends React.Component {
                   <button
                     type="submit"
                     className="btn btn-default"
-                    onClick={this.updateFilters}>Submit</button>
+                    onClick={this.updateFilters}>Update</button>
                 </div>
               </div>
 

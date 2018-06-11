@@ -48,6 +48,24 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  > * {
+    flex: 1 0 auto;
+  }
+}
+
+.datepicker-column span {
+  flex: 0 0 30px;
+  text-align: center;
+}
+
+.react-datepicker-wrapper,
+.react-datepicker__input-container {
+  width: 100%;
+}
+
+form .row > div {
+  padding-bottom: 15px;
 }
 
 @import 'Modal.scss';
