@@ -75,6 +75,10 @@ export default class IncidentList extends React.Component {
               <th>
                 Details
               </th>
+
+              <th>
+                Disposition
+              </th>
             </tr>
           </thead>
 
@@ -108,6 +112,20 @@ export default class IncidentList extends React.Component {
 
                   <td>
                     {incident.narrative}
+                    {incident.referToSummons &&
+                      <span>
+                        <br />Refer to Summons: {incident.referToSummons}
+                      </span>
+                    }
+                    {incident.referToIncident &&
+                      <span>
+                        <br />Refer to Incident: {incident.referToIncident}
+                      </span>
+                    }
+                  </td>
+
+                  <td>
+                    {incident.disposition}
                   </td>
 
                 </tr>
